@@ -1,10 +1,10 @@
 #include <iostream>
-#include <Box2D/Box2D.h>
+#include <box2d/box2d.h>
 #include <SFML/Graphics.hpp>
 #include <chrono>
 #include <cstdio>
-#define W 1366
-#define H 768
+#define W 1920
+#define H 1080
 #define scale 30.
 #define fW(x) x*scale
 #define tW(x) x/scale
@@ -45,6 +45,7 @@ b2Body *inttody(int x, int y, int w, int h, btype data)
 	b2BodyDef bdef;
 	bdef.position.Set(x/scale, y/scale);
 	bdef.type = b2_dynamicBody;
+	bdef.userData.pointer = data;
 
 	for(int i=0; i<200; i++)
 	{
@@ -54,7 +55,7 @@ b2Body *inttody(int x, int y, int w, int h, btype data)
 	//bfix.restitution = 0.6;
 	bfix.density = 3;
 	body->CreateFixture(&bfix);
-	body->SetUserData((void*)data);
+	//body->SetUserData((void*)data);
 	}
 	return 0;
 }
@@ -66,6 +67,7 @@ b2Body *intplayes(int x, int y, int r,  btype data)
 	b2BodyDef bdef;
 	bdef.position.Set(x/scale, y/scale);
 	bdef.type = b2_dynamicBody;
+	bdef.userData.pointer = data;
 
 	b2Body *body = world.CreateBody(&bdef);
 	b2FixtureDef bfix;
@@ -73,7 +75,7 @@ b2Body *intplayes(int x, int y, int r,  btype data)
 	bfix.restitution = 0.3;
 	bfix.density = 20;
 	body->CreateFixture(&bfix);
-	body->SetUserData((void*)data);
+	//body->SetUserData((void*)data);
 
 	return body;
 }
@@ -105,7 +107,7 @@ int main()
 	inttody(1600, 100, 32, 32, btype::box);
 	b2Body *player = intplayes(200, 200, 64, btype::player);
 
-	world.Dump();
+//	world.Dump();
 	bool onGnd = 0;
 	auto tp1 = chrono::system_clock::now(); // Переменные для подсчета
 	auto tp2 = chrono::system_clock::now();
@@ -191,15 +193,15 @@ int main()
 		//world.Dump();
 			//cout  <<endl;
 			b2Vec2 ppos = player->GetPosition();
-			//ppos.y += 70/scale;
+			ppos.y += 70/scale;
 			if(it->GetFixtureList()->TestPoint(ppos+b2Vec2(0, 65/scale))||
 					it->GetFixtureList()->TestPoint(ppos+b2Vec2(-5/scale,66/scale))||
 					it->GetFixtureList()->TestPoint(ppos+b2Vec2(5/scale,66/scale)))
 				onGnd = true;
 			//else onGnd = false;
 
-			if(!it->GetUserData()) continue;
-			if(it->GetUserData() == (void*)btype::box)
+			if(!it->GetUserData().pointer) continue;
+			if(it->GetUserData().pointer == btype::box)
 			{
 				b2Vec2 pos = it->GetPosition();
 				float ang = it->GetAngle();
@@ -209,7 +211,7 @@ int main()
 				app.draw(box);
 				if(pos.y*scale>(H)) world.DestroyBody(it);
 			}
-			else if(it->GetUserData() == (void*)btype::player)
+			else if(it->GetUserData().pointer == btype::player)
 			{
 				b2Vec2 pos = it->GetPosition();
 				float ang = it->GetAngle();
