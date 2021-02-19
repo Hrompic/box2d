@@ -93,17 +93,25 @@ int main()
 	t1.setSmooth(true);
 	t2.setSmooth(true);
 
-	Sprite gr(t3, IntRect(0 ,0, 70*120, 70)), play(t2), box(t1);
+	Sprite gr(t3, IntRect(0 ,0, 70*120, 70)),//Horizontall wall: 70 - width, 120 times
+			vgr(t3, IntRect(0 ,0, 70, 70*20)),//Verticall wall: 70 - height, 20 times
+			play(t2),
+			box(t1);
 	box.setOrigin(32, 32);
 	play.setOrigin(64, 64);
 	gr.setPosition(0, H-70);
+	vgr.setPosition(0, H-70*20);
 	box.setOrigin(box.getLocalBounds().width/2., box.getLocalBounds().width/2.);
 
 	View view(Vector2f(W/2,H/2), Vector2f(W,H));
 	app.setView(view);
-//	app.setFramerateLimit(90);
-	app.setVerticalSyncEnabled(true);
-	setWall(70*120/2., H-70/2., 70*120/2., 70/2.);
+	app.setFramerateLimit(120);
+//	app.setVerticalSyncEnabled(true);
+	setWall(70*120/2., H-70/2., 70*120/2., 70/2.);//Left side
+	setWall(70/2., H-70*20/2., 70/2., 70*20./2.);//Right side
+
+
+	setWall(70*120.+70/2, H-70*20/2., 70/2., 70*20./2.);
 	inttody(1600, 100, 32, 32, btype::box);
 	b2Body *player = intplayes(200, 200, 64, btype::player);
 
@@ -141,7 +149,7 @@ int main()
 		}
 		if(Keyboard::isKeyPressed(Keyboard::Right)) player->ApplyForceToCenter(b2Vec2(force,0), 1);
 		if(Keyboard::isKeyPressed(Keyboard::Left)) player->ApplyForceToCenter(b2Vec2(-force,0), 1);
-		if(Keyboard::isKeyPressed(Keyboard::Up )&& onGnd) {player->ApplyForceToCenter(b2Vec2(0,-160000), 1); onGnd = false;}
+		if(Keyboard::isKeyPressed(Keyboard::Up )&& onGnd) {player->ApplyForceToCenter(b2Vec2(0,-16000), 1);}// onGnd = false;}
 
 		app.clear(Color::Blue);
 		world.Step(1/60., 8, 3);
@@ -198,7 +206,7 @@ int main()
 					it->GetFixtureList()->TestPoint(ppos+b2Vec2(-5/scale,66/scale))||
 					it->GetFixtureList()->TestPoint(ppos+b2Vec2(5/scale,66/scale)))
 				onGnd = true;
-			//else onGnd = false;
+//			else onGnd = false;
 
 			if(!it->GetUserData().pointer) continue;
 			if(it->GetUserData().pointer == btype::box)
@@ -220,7 +228,7 @@ int main()
 				//cout <<pos.x*scale <<" " <<pos.y*scale <<endl;
 				view.setCenter(pos.x*scale, pos.y*scale);
 				app.draw(play);
-				if(pos.y*scale>(H)) world.DestroyBody(it);
+//				if(pos.y*scale>(H)) world.DestroyBody(it);
 			}
 
 		}
@@ -229,6 +237,10 @@ int main()
 		sf::Text my(text, font);
 		my.setPosition(view.getCenter().x-W/2, view.getCenter().y-H/2);
 		app.draw(gr);
+		app.draw(vgr);
+		vgr.setPosition(70*120, H-70*20);
+		app.draw(vgr);
+		vgr.setPosition(0, H-70*20);
 		app.setView(view);
 		app.draw(my);
 		app.display();
