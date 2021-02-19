@@ -93,7 +93,7 @@ int main()
 	t1.setSmooth(true);
 	t2.setSmooth(true);
 
-	Sprite gr(t3, IntRect(0 ,0, 70*120, 70)),//Horizontall wall: 70 - width, 120 times
+	Sprite gr(t3, IntRect(0 ,0, 70*1200, 70)),//Horizontall wall: 70 - width, 120 times
 			vgr(t3, IntRect(0 ,0, 70, 70*20)),//Verticall wall: 70 - height, 20 times
 			play(t2),
 			box(t1);
@@ -107,11 +107,11 @@ int main()
 	app.setView(view);
 	app.setFramerateLimit(120);
 //	app.setVerticalSyncEnabled(true);
-	setWall(70*120/2., H-70/2., 70*120/2., 70/2.);//Left side
+	setWall(70*1200/2., H-70/2., 70*1200/2., 70/2.);//Left side
 	setWall(70/2., H-70*20/2., 70/2., 70*20./2.);//Right side
 
 
-	setWall(70*120.+70/2, H-70*20/2., 70/2., 70*20./2.);
+	setWall(70*1200.+70/2, H-70*20/2., 70/2., 70*20./2.);
 	inttody(1600, 100, 32, 32, btype::box);
 	b2Body *player = intplayes(200, 200, 64, btype::player);
 
@@ -238,7 +238,7 @@ int main()
 		my.setPosition(view.getCenter().x-W/2, view.getCenter().y-H/2);
 		app.draw(gr);
 		app.draw(vgr);
-		vgr.setPosition(70*120, H-70*20);
+		vgr.setPosition(70*1200, H-70*20);
 		app.draw(vgr);
 		vgr.setPosition(0, H-70*20);
 		app.setView(view);
