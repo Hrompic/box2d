@@ -107,11 +107,11 @@ int main()
 	app.setView(view);
 	app.setFramerateLimit(120);
 //	app.setVerticalSyncEnabled(true);
-	setWall(70*1200/2., H-70/2., 70*1200/2., 70/2.);//Left side
-	setWall(70/2., H-70*20/2., 70/2., 70*20./2.);//Right side
+	setWall(70*1200/2., H-70/2., 70*1200/2., 70/2.);//Bottom
+	setWall(70/2., H-70*20/2., 70/2., 70*20./2.);//Left side
 
 
-	setWall(70*1200.+70/2, H-70*20/2., 70/2., 70*20./2.);
+	setWall(70*1200.+70/2, H-70*20/2., 70/2., 70*20./2.);//Right side
 	inttody(1600, 100, 32, 32, btype::box);
 	b2Body *player = intplayes(200, 200, 64, btype::player);
 
@@ -154,47 +154,49 @@ int main()
 		app.clear(Color::Blue);
 		world.Step(1/60., 8, 3);
 
-//		for(b2Contact *c = world.GetContactList(); c; c = c->GetNext())
-//		{
-//			b2WorldManifold wm;
-//			c->GetWorldManifold(&wm);
-//			if(!c->IsTouching()) continue;
-//			if(c->GetFixtureA()->GetBody()->GetUserData() == (void*)btype::player)
-//			{
-//				printf("player x:%f ",fW(c->GetManifold()->points[1].localPoint.x));
-//				printf("playeer y:%f\n",fW(c->GetManifold()->points[1].localPoint.y));
+		for(b2Contact *c = world.GetContactList(); c; c = c->GetNext())
+		{
+			b2WorldManifold wm;
+			c->GetWorldManifold(&wm);
+			if(!c->IsTouching()) continue;
+			if(c->GetFixtureA()->GetBody()->GetUserData().pointer == btype::player)
+			{
+				printf("player x:%f ",fW(c->GetManifold()->points[1].localPoint.x));
+				printf("playeer y:%f\n",fW(c->GetManifold()->points[1].localPoint.y));
 
-//			}
-//			if(c->GetFixtureB()->GetBody()->GetUserData() == (void*)btype::player)
-//			for(int i=0; i<2; i++)
+			}
+			if(c->GetFixtureB()->GetBody()->GetUserData().pointer == btype::player)
+			for(int i=0; i<2; i++)
+			{
+//				int i = 0;
+//				printf("player x[%d]:%f ",i, fW(c->GetManifold()->points[i].localPoint.x));
+//				printf("playeer y[%d]:%f\n",i, fW(c->GetManifold()->points[i].localPoint.y));
+//				cout <<"playe:"<< fW(c->GetManifold()->localPoint.x) <<endl;
+//				cout <<"playe:"<< fW(c->GetManifold()->localPoint.y) <<endl;
+				cout <<"playe x:" <<fW(c->GetFixtureB()->GetBody()->GetPosition().x-wm.points[i].x) <<endl;
+				cout <<"playe x:" <<fW(c->GetFixtureB()->GetBody()->GetPosition().y-wm.points[i].y) <<endl;
+				printf("player x[%d]: %f \n", i, fW(wm.points[i].x));
+				printf("player y[%d]: %f \n", i, fW(wm.points[i].y));
+				Vertex *v = new Vertex(Vector2f(fW(wm.points[i].x), fW(wm.points[i].y)));
+				app.draw(v, 1, Points);
+			}
+//			for(b2Contact *c = world.GetContactList(); c; c = c->GetNext())
 //			{
-////				int i = 0;
-////				printf("player x[%d]:%f ",i, fW(c->GetManifold()->points[i].localPoint.x));
-////				printf("playeer y[%d]:%f\n",i, fW(c->GetManifold()->points[i].localPoint.y));
-////				cout <<"playe:"<< fW(c->GetManifold()->localPoint.x) <<endl;
-////				cout <<"playe:"<< fW(c->GetManifold()->localPoint.y) <<endl;
-//				cout <<"playe x:" <<fW(c->GetFixtureB()->GetBody()->GetPosition().x-wm.points[i].x) <<endl;
-//				cout <<"playe x:" <<fW(c->GetFixtureB()->GetBody()->GetPosition().y-wm.points[i].y) <<endl;
-//				printf("player x[%d]: %f \n", i, fW(wm.points[i].x));
-//				printf("player y[%d]: %f \n", i, fW(wm.points[i].y));
-//			}
-////			for(b2Contact *c = world.GetContactList(); c; c = c->GetNext())
-////			{
-////				if(c->GetFixtureA()->GetBody()->GetUserData() ==(void*)btype::box)
-////				{
-////					printf("box x:%f ",fW(c->GetManifold()->points[1].localPoint.x));
-////					printf("box y:%f\n",fW(c->GetManifold()->points[1].localPoint.y));
+//				if(c->GetFixtureA()->GetBody()->GetUserData() ==(void*)btype::box)
+//				{
+//					printf("box x:%f ",fW(c->GetManifold()->points[1].localPoint.x));
+//					printf("box y:%f\n",fW(c->GetManifold()->points[1].localPoint.y));
 
-////				}
-////				if(c->GetFixtureB()->GetBody()->GetUserData() ==(void*)btype::box)
-////				for(int i=0; i<2; i++)
-////				{
-////					printf("box x[%d]:%f ",i, fW(c->GetManifold()->points[i].localPoint.x));
-////					printf("box y[%d]:%f\n",i, fW(c->GetManifold()->points[i].localPoint.y));
-////					cout <<"box:"<< c->GetManifold()->pointCount <<endl;
-////				}
-////			}
-//		}
+//				}
+//				if(c->GetFixtureB()->GetBody()->GetUserData() ==(void*)btype::box)
+//				for(int i=0; i<2; i++)
+//				{
+//					printf("box x[%d]:%f ",i, fW(c->GetManifold()->points[i].localPoint.x));
+//					printf("box y[%d]:%f\n",i, fW(c->GetManifold()->points[i].localPoint.y));
+//					cout <<"box:"<< c->GetManifold()->pointCount <<endl;
+//				}
+//			}
+		}
 		for(b2Body *it = world.GetBodyList(); it; it = it->GetNext() )
 		{
 			//it->Dump();
