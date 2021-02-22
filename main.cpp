@@ -72,7 +72,7 @@ b2Body *intplayes(int x, int y, int r,  btype data)
 	b2Body *body = world.CreateBody(&bdef);
 	b2FixtureDef bfix;
 	bfix.shape = &sh;
-	bfix.restitution = 0.3;
+	bfix.restitution = 0.4;
 	bfix.density = 20;
 	body->CreateFixture(&bfix);
 	//body->SetUserData((void*)data);
@@ -125,6 +125,8 @@ int main()
 	font.loadFromFile("/usr/share/fonts/truetype/freefont/FreeSans.ttf");
 	char text[64];
 	float force = 1800.;
+	b2Vec2 pcol(0, 0);
+	double ang = .0;
 	while(app.isOpen())
 	{
 		tp2 = chrono::system_clock::now();
@@ -163,6 +165,12 @@ int main()
 			{
 				printf("player x:%f ",fW(c->GetManifold()->points[1].localPoint.x));
 				printf("playeer y:%f\n",fW(c->GetManifold()->points[1].localPoint.y));
+				CircleShape pcol(10);
+				pcol.setOrigin(5, 5);
+				pcol.setFillColor(Color::Black);
+				pcol.setPosition(Vector2f(fW(c->GetManifold()->points[1].localPoint.x), fW(c->GetManifold()->points[1].localPoint.y)));
+//				app.draw(v, 1, Points);
+				app.draw(pcol);
 
 			}
 			if(c->GetFixtureB()->GetBody()->GetUserData().pointer == btype::player)
@@ -173,12 +181,20 @@ int main()
 //				printf("playeer y[%d]:%f\n",i, fW(c->GetManifold()->points[i].localPoint.y));
 //				cout <<"playe:"<< fW(c->GetManifold()->localPoint.x) <<endl;
 //				cout <<"playe:"<< fW(c->GetManifold()->localPoint.y) <<endl;
-				cout <<"playe x:" <<fW(c->GetFixtureB()->GetBody()->GetPosition().x-wm.points[i].x) <<endl;
-				cout <<"playe x:" <<fW(c->GetFixtureB()->GetBody()->GetPosition().y-wm.points[i].y) <<endl;
+				cout <<"playe x:" <<fW(wm.points[i].x-c->GetFixtureB()->GetBody()->GetPosition().x) <<endl;
+				cout <<"playe x:" <<fW(wm.points[i].y-c->GetFixtureB()->GetBody()->GetPosition().y) <<endl;
 				printf("player x[%d]: %f \n", i, fW(wm.points[i].x));
 				printf("player y[%d]: %f \n", i, fW(wm.points[i].y));
-				Vertex *v = new Vertex(Vector2f(fW(wm.points[i].x), fW(wm.points[i].y)));
-				app.draw(v, 1, Points);
+//				Vertex *v = new Vertex(Vector2f(fW(wm.points[i].x), fW(wm.points[i].y)));
+				CircleShape pcoll(10);
+				pcoll.setOrigin(5, 5);
+				pcoll.setFillColor(Color::White);
+				pcol = wm.points[0];
+				if(i)
+					pcoll.setFillColor(Color::Black);
+				pcoll.setPosition(Vector2f(fW(wm.points[i].x), fW(wm.points[i].y)));
+//				app.draw(v, 1, Points);
+				app.draw(pcoll);
 			}
 //			for(b2Contact *c = world.GetContactList(); c; c = c->GetNext())
 //			{
@@ -224,6 +240,14 @@ int main()
 			else if(it->GetUserData().pointer == btype::player)
 			{
 				b2Vec2 pos = it->GetPosition();
+				{
+					if(pcol.x||pcol.y)
+					{
+						double a = (pos.y-pcol.y)/(pcol.x-pos.x);
+						ang = atan(a)*deg;
+						cout <<"Angle: \n" <<ang <<endl;
+					}
+				}
 				float ang = it->GetAngle();
 				play.setPosition(pos.x*scale, pos.y*scale);
 				play.setRotation(ang*deg);
@@ -235,7 +259,8 @@ int main()
 
 		}
 
-		sprintf(text, "Position x: %.2f y: %.2f\tFps: %.2f Force: %.0f", play.getPosition().x, play.getPosition().y, 1/elapsedTime.count(), force);
+		sprintf(text, "Position x: %.2f y: %.2f\tFps: %.2f Force: %.0f Angle: %.2lf", play.getPosition().x, play.getPosition().y, 1/elapsedTime.count(), force, ang);
+		ang = 0;
 		sf::Text my(text, font);
 		my.setPosition(view.getCenter().x-W/2, view.getCenter().y-H/2);
 		app.draw(gr);
