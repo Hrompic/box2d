@@ -9,6 +9,7 @@
 #define fW(x) x*scale
 #define tW(x) x/scale
 #define deg 57.59577
+#define DEBUG 0
 class World
 {
 	World();
@@ -127,6 +128,7 @@ int main()
 	float force = 1800.;
 	b2Vec2 pcol(0, 0);
 	double ang = .0;
+	b2Vec2 pos(0, 0);
 	while(app.isOpen())
 	{
 		tp2 = chrono::system_clock::now();
@@ -151,81 +153,18 @@ int main()
 		}
 		if(Keyboard::isKeyPressed(Keyboard::Right)) player->ApplyForceToCenter(b2Vec2(force,0), 1);
 		if(Keyboard::isKeyPressed(Keyboard::Left)) player->ApplyForceToCenter(b2Vec2(-force,0), 1);
-		if(Keyboard::isKeyPressed(Keyboard::Up )&& onGnd) {player->ApplyForceToCenter(b2Vec2(0,-16000), 1);}// onGnd = false;}
+		if(Keyboard::isKeyPressed(Keyboard::Up )&& onGnd) {player->ApplyForceToCenter(b2Vec2(0,-60000), 1); onGnd = false;}
+		if(Keyboard::isKeyPressed(Keyboard::Down)) {player->ApplyForceToCenter(b2Vec2(0,160000), 1);}// onGnd = false;}
 
 		app.clear(Color::Blue);
 		world.Step(1/60., 8, 3);
+//		app.draw(play);
 
-		for(b2Contact *c = world.GetContactList(); c; c = c->GetNext())
-		{
-			b2WorldManifold wm;
-			c->GetWorldManifold(&wm);
-			if(!c->IsTouching()) continue;
-			if(c->GetFixtureA()->GetBody()->GetUserData().pointer == btype::player)
-			{
-				printf("player x:%f ",fW(c->GetManifold()->points[1].localPoint.x));
-				printf("playeer y:%f\n",fW(c->GetManifold()->points[1].localPoint.y));
-				CircleShape pcol(10);
-				pcol.setOrigin(5, 5);
-				pcol.setFillColor(Color::Black);
-				pcol.setPosition(Vector2f(fW(c->GetManifold()->points[1].localPoint.x), fW(c->GetManifold()->points[1].localPoint.y)));
-//				app.draw(v, 1, Points);
-				app.draw(pcol);
-
-			}
-			if(c->GetFixtureB()->GetBody()->GetUserData().pointer == btype::player)
-			for(int i=0; i<2; i++)
-			{
-//				int i = 0;
-//				printf("player x[%d]:%f ",i, fW(c->GetManifold()->points[i].localPoint.x));
-//				printf("playeer y[%d]:%f\n",i, fW(c->GetManifold()->points[i].localPoint.y));
-//				cout <<"playe:"<< fW(c->GetManifold()->localPoint.x) <<endl;
-//				cout <<"playe:"<< fW(c->GetManifold()->localPoint.y) <<endl;
-				cout <<"playe x:" <<fW(wm.points[i].x-c->GetFixtureB()->GetBody()->GetPosition().x) <<endl;
-				cout <<"playe x:" <<fW(wm.points[i].y-c->GetFixtureB()->GetBody()->GetPosition().y) <<endl;
-				printf("player x[%d]: %f \n", i, fW(wm.points[i].x));
-				printf("player y[%d]: %f \n", i, fW(wm.points[i].y));
-//				Vertex *v = new Vertex(Vector2f(fW(wm.points[i].x), fW(wm.points[i].y)));
-				CircleShape pcoll(10);
-				pcoll.setOrigin(5, 5);
-				pcoll.setFillColor(Color::White);
-				pcol = wm.points[0];
-				if(i)
-					pcoll.setFillColor(Color::Black);
-				pcoll.setPosition(Vector2f(fW(wm.points[i].x), fW(wm.points[i].y)));
-//				app.draw(v, 1, Points);
-				app.draw(pcoll);
-			}
-//			for(b2Contact *c = world.GetContactList(); c; c = c->GetNext())
-//			{
-//				if(c->GetFixtureA()->GetBody()->GetUserData() ==(void*)btype::box)
-//				{
-//					printf("box x:%f ",fW(c->GetManifold()->points[1].localPoint.x));
-//					printf("box y:%f\n",fW(c->GetManifold()->points[1].localPoint.y));
-
-//				}
-//				if(c->GetFixtureB()->GetBody()->GetUserData() ==(void*)btype::box)
-//				for(int i=0; i<2; i++)
-//				{
-//					printf("box x[%d]:%f ",i, fW(c->GetManifold()->points[i].localPoint.x));
-//					printf("box y[%d]:%f\n",i, fW(c->GetManifold()->points[i].localPoint.y));
-//					cout <<"box:"<< c->GetManifold()->pointCount <<endl;
-//				}
-//			}
-		}
 		for(b2Body *it = world.GetBodyList(); it; it = it->GetNext() )
 		{
 			//it->Dump();
 		//world.Dump();
 			//cout  <<endl;
-			b2Vec2 ppos = player->GetPosition();
-			ppos.y += 70/scale;
-			if(it->GetFixtureList()->TestPoint(ppos+b2Vec2(0, 65/scale))||
-					it->GetFixtureList()->TestPoint(ppos+b2Vec2(-5/scale,66/scale))||
-					it->GetFixtureList()->TestPoint(ppos+b2Vec2(5/scale,66/scale)))
-				onGnd = true;
-//			else onGnd = false;
-
 			if(!it->GetUserData().pointer) continue;
 			if(it->GetUserData().pointer == btype::box)
 			{
@@ -239,15 +178,7 @@ int main()
 			}
 			else if(it->GetUserData().pointer == btype::player)
 			{
-				b2Vec2 pos = it->GetPosition();
-				{
-					if(pcol.x||pcol.y)
-					{
-						double a = (pos.y-pcol.y)/(pcol.x-pos.x);
-						ang = atan(a)*deg;
-						cout <<"Angle: \n" <<ang <<endl;
-					}
-				}
+				pos = it->GetPosition();
 				float ang = it->GetAngle();
 				play.setPosition(pos.x*scale, pos.y*scale);
 				play.setRotation(ang*deg);
@@ -257,6 +188,42 @@ int main()
 //				if(pos.y*scale>(H)) world.DestroyBody(it);
 			}
 
+		}
+		for(b2Contact *c = world.GetContactList(); c; c = c->GetNext())
+		{
+			b2WorldManifold wm;
+			c->GetWorldManifold(&wm);
+			if(!c->IsTouching()) continue;
+			if(c->GetFixtureB()->GetBody()->GetUserData().pointer == btype::player)
+			for(int i=0; i<2; i++)
+			{
+
+//				cout <<"playe x:" <<fW(wm.points[i].x-c->GetFixtureB()->GetBody()->GetPosition().x) <<endl;
+//				cout <<"playe x:" <<fW(wm.points[i].y-c->GetFixtureB()->GetBody()->GetPosition().y) <<endl;
+//				printf("player x[%d]: %f \n", i, fW(wm.points[i].x));
+//				printf("player y[%d]: %f \n", i, fW(wm.points[i].y));
+#if DEBUG
+				CircleShape pcoll(10);
+				pcoll.setOrigin(5, 5);
+				pcoll.setFillColor(Color::White);
+				if(i)
+					pcoll.setFillColor(Color::Black);
+				pcoll.setPosition(Vector2f(fW(wm.points[i].x), fW(wm.points[i].y)));
+
+				app.draw(pcoll);
+#endif
+				pcol = wm.points[0];
+
+				//calculate player angle
+				if((pcol.x||pcol.y) && (pcol.y>pos.y))
+				{
+					double a = (pos.y-pcol.y)/(pcol.x-pos.x);
+					ang = abs(atan(a)*deg);
+					if(ang>40.)
+						onGnd = true;
+				}
+
+			}
 		}
 
 		sprintf(text, "Position x: %.2f y: %.2f\tFps: %.2f Force: %.0f Angle: %.2lf", play.getPosition().x, play.getPosition().y, 1/elapsedTime.count(), force, ang);
