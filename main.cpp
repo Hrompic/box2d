@@ -3,6 +3,14 @@
 #include <SFML/Graphics.hpp>
 #include <chrono>
 #include <cstdio>
+#ifdef __ANDROID__
+
+#include <jni.h>
+#include <android/native_activity.h>
+#include <android/log.h>
+#define LOGE(...) ((void)__android_log_print(ANDROID_LOG_INFO, "Mysfml", __VA_ARGS__))
+
+#endif
 #define W 1920
 #define H 1080
 #define scale 30.
@@ -80,8 +88,11 @@ b2Body *intplayes(int x, int y, int r,  btype data)
 
 	return body;
 }
-int main()
+int main(int argc, char* argv[])
 {
+#ifdef __ANDROID__
+	LOGE("started");
+#endif
 	ContextSettings ctx;
 	ctx.antialiasingLevel = 16;
 	RenderWindow app(VideoMode(W, H), "Box2d", Style::Fullscreen, ctx);
