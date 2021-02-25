@@ -17,7 +17,7 @@
 #define fW(x) x*scale
 #define tW(x) x/scale
 #define deg 57.59577
-#define DEBUG 0
+#define DEBUG 1
 class World
 {
 	World();
@@ -88,15 +88,17 @@ b2Body *intplayes(int x, int y, int r,  btype data)
 
 	return body;
 }
-int main(int argc, char* argv[])
+int main(int , char* [])
 {
 #ifdef __ANDROID__
 	LOGE("started");
+	RenderWindow app(VideoMode(VideoMode::getDesktopMode()), "Box2d");
 #endif
+#ifndef __ANDROID__
 	ContextSettings ctx;
 	ctx.antialiasingLevel = 16;
 	RenderWindow app(VideoMode(W, H), "Box2d", Style::Fullscreen, ctx);
-
+#endif
 	Texture t1, t2, t3;
 	t1.loadFromFile("images/crate_43.png");
 	t2.loadFromFile("images/gorilla.png");
@@ -135,8 +137,11 @@ int main(int argc, char* argv[])
 	Font font;
 	//font.loadFromFile("/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf");
 	font.loadFromFile("/usr/share/fonts/truetype/freefont/FreeSans.ttf");
+#ifdef __ANDROID__
+	font.loadFromFile("/system/fonts/DroidSans.ttf");
+#endif
 	char text[64];
-	float force = 1800.;
+	float force = 18000.;
 	b2Vec2 pcol(0, 0);
 	double ang = .0;
 	b2Vec2 pos(0, 0);
@@ -162,6 +167,9 @@ int main(int argc, char* argv[])
 						force-=400;
 			}
 		}
+#ifdef __ANDROID__
+		if(Touch::isDown(0)) player->ApplyForceToCenter(b2Vec2(force,0), 1);
+#endif
 		if(Keyboard::isKeyPressed(Keyboard::Right)) player->ApplyForceToCenter(b2Vec2(force,0), 1);
 		if(Keyboard::isKeyPressed(Keyboard::Left)) player->ApplyForceToCenter(b2Vec2(-force,0), 1);
 		if(Keyboard::isKeyPressed(Keyboard::Up )&& onGnd) {player->ApplyForceToCenter(b2Vec2(0,-60000), 1); onGnd = false;}
@@ -237,7 +245,8 @@ int main(int argc, char* argv[])
 			}
 		}
 
-		sprintf(text, "Position x: %.2f y: %.2f\tFps: %.2f Force: %.0f Angle: %.2lf", play.getPosition().x, play.getPosition().y, 1/elapsedTime.count(), force, ang);
+		sprintf(text, "Position x: %.2f y: %.2f\tFps: %.2f Force: %.0f Angle: %.2lf",
+				play.getPosition().x, play.getPosition().y, 1/elapsedTime.count(), force, ang);
 		ang = 0;
 		sf::Text my(text, font);
 		my.setPosition(view.getCenter().x-W/2, view.getCenter().y-H/2);
@@ -247,6 +256,7 @@ int main(int argc, char* argv[])
 		app.draw(vgr);
 		vgr.setPosition(0, H-70*20);
 		app.setView(view);
+		my.setFillColor(Color::Black);
 		app.draw(my);
 		app.display();
 	}
