@@ -8,8 +8,17 @@
 #include <jni.h>
 #include <android/native_activity.h>
 #include <android/log.h>
+
+#include <GLES/gl.h>
+#include <GLES/glext.h>
+#include <GLES2/gl2platform.h>
+#include <GLES2/gl2ext.h>
+
 #define LOGE(...) ((void)__android_log_print(ANDROID_LOG_INFO, "Mysfml", __VA_ARGS__))
 
+#endif
+#ifndef __ANDROID__
+#include <GL/gl.h>
 #endif
 #define W 1920
 #define H 1080
@@ -103,7 +112,23 @@ int main(int , char* [])
 	t1.loadFromFile("images/crate_43.png");
 	t2.loadFromFile("images/gorilla.png");
 	t3.loadFromFile("images/slice01_01.png");
-	t3.setRepeated(true);
+//	t3.setRepeated(true);
+	unsigned int texr = t3.getNativeHandle();
+	glBindTexture(GL_TEXTURE_2D, texr);
+	if(glGetError ()) return -1;;
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	if(glGetError ()) return -1;;
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	if(glGetError ()) return -1;;
+
+//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		if(glGetError ()) return -1;;
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, 0x2900);
+		if(glGetError ()) return -1;;
+//	t3.setRepeated(true);
+	t3.setSmooth(true);
 	t1.setSmooth(true);
 	t2.setSmooth(true);
 
@@ -138,7 +163,8 @@ int main(int , char* [])
 	//font.loadFromFile("/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf");
 	font.loadFromFile("/usr/share/fonts/truetype/freefont/FreeSans.ttf");
 #ifdef __ANDROID__
-	font.loadFromFile("/system/fonts/DroidSans.ttf");
+//	font.loadFromFile("/system/fonts/Roboto-Regular.ttf");//Not working
+	font.loadFromFile("fonts/FreeSans.ttf");
 #endif
 	char text[64];
 	float force = 18000.;
@@ -155,8 +181,14 @@ int main(int , char* [])
 		Event event;
 		while (app.pollEvent(event))
 		{
-			if(event.type ==Event::Closed)
+			if(event.type == Event::Closed)
 				app.close();
+			if(event.type == Event::LostFocus)
+				while(!(event.type == Event::GainedFocus))
+				{
+					app.pollEvent(event);
+					sleep(milliseconds(50));
+				}
 			else if(event.type == Event::KeyPressed)
 			{
 					if(event.key.code == Keyboard::Z)
