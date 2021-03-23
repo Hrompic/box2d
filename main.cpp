@@ -1,6 +1,8 @@
 #include <iostream>
 #include <box2d/box2d.h>
 #include <SFML/Graphics.hpp>
+#include <imgui-SFML.h>
+#include <imgui.h>
 #include <chrono>
 #include <cstdio>
 #ifdef __ANDROID__
@@ -42,6 +44,7 @@ b2Vec2 gravity(0., 9.8);
 b2World world(gravity);
 using namespace std;
 using namespace sf;
+using namespace ImGui;
 
 void setWall(int x, int y, int w, int h)
 {
@@ -113,6 +116,7 @@ int main(int , char* [])
 	t2.loadFromFile("images/gorilla.png");
 	t3.loadFromFile("images/slice01_01.png");
 //	t3.setRepeated(true);
+	SFML::Init(app);
 	unsigned int texr = t3.getNativeHandle();
 	glBindTexture(GL_TEXTURE_2D, texr);
 	if(glGetError ()) return -1;;
@@ -181,6 +185,7 @@ int main(int , char* [])
 		Event event;
 		while (app.pollEvent(event))
 		{
+
 			if(event.type == Event::Closed)
 				app.close();
 			if(event.type == Event::LostFocus)
@@ -198,6 +203,7 @@ int main(int , char* [])
 					if(event.key.code == Keyboard::E)
 						force-=400;
 			}
+		SFML::ProcessEvent(event);
 		}
 #ifdef __ANDROID__
 		if(Touch::isDown(0)) player->ApplyForceToCenter(b2Vec2(force,0), 1);
@@ -289,6 +295,14 @@ int main(int , char* [])
 		vgr.setPosition(0, H-70*20);
 		app.setView(view);
 		my.setFillColor(Color::Black);
+
+		SFML::Update(app, seconds(elapsedTime.count()));
+		ShowDemoWindow();
+		Begin("Hello");
+		Button("button");
+		End();
+		SFML::Render(app);
+
 		app.draw(my);
 		app.display();
 	}
