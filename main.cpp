@@ -117,6 +117,10 @@ int main(int , char* [])
 	t3.loadFromFile("images/slice01_01.png");
 //	t3.setRepeated(true);
 	SFML::Init(app);
+#ifdef __ANDROID__
+	GetStyle().ScaleAllSizes(5);
+	GetIO().FontGlobalScale = 2.5;
+#endif
 	unsigned int texr = t3.getNativeHandle();
 	glBindTexture(GL_TEXTURE_2D, texr);
 	if(glGetError ()) return -1;;
